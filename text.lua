@@ -1,3 +1,5 @@
+--this code is from: https://www.lexaloffle.com/bbs/?tid=31772
+
 function whitespace(s, i)
     if i > #s then return 0
     elseif sub(s, i, i) == " " then return 1
