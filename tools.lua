@@ -163,8 +163,18 @@ function checkMouseCanvasCollision()
     end
 end
 --------------------------------------------------------
-function checkMouseTopScreen()
-    if Mouse.y <= 10 then
+function checkMouseTopScreen(limit)
+    local value = limit 
+    if limit == nil then limit = 5 end
+    if Mouse.y <= limit then
+        return true
+    else
+        return false
+    end
+end
+--------------------------------------------------------
+function checkMouseBottonScreen()
+    if Mouse.y >= 122 then
         return true
     else
         return false
@@ -275,15 +285,36 @@ function create_button(x,y,color,text,varBox)
         x=x,
         y=y,
         color=color,
+        stdColor = color,
+        pressedColor = 8,
         text=text,
         varBox=varBox,
         area = {x0=0,y0=0,x1=1,y1=1},
+        clicked = false,
+        clickTimer = 0,
+        clickMaxTimer=5,
+
+        on_click = function(self)
+            self.clickTimer = self.clickMaxTimer
+            self.clicked = true
+        end,
+
+        update = function(self)
+            if self.clicked then
+                self.clickTimer -= 1
+                self.color = self.pressedColor
+                if self.clickTimer < 0 then
+                    self.clicked = false
+                    self.color = self.stdColor
+                end
+            end
+        end,
 
         draw = function(self)
             local digits = #tostr(self.text)
             local adjustSize = (digits) * 4
             rectfill(self.x-2-adjustSize/2,self.y-2,self.x+adjustSize/2,self.y+7,0)
-            rect(self.x-2-adjustSize/2,self.y-2,self.x+adjustSize/2,self.y+7,7)
+            rect(self.x-2-adjustSize/2,self.y-2,self.x+adjustSize/2,self.y+7,self.color)
             print(self.text,self.x-adjustSize/2,self.y,self.color)
         end,
     }
@@ -302,7 +333,7 @@ function create_manager(x,y,minValue,maxValue,varTitle)
         y=y,
         varTitle=varTitle,
         plusButton = create_button(x,y,7,"+"),
-        minusButton = create_button(x+8,y,7,"-"),
+        minusButton = create_button(x+10,y,7,"-"),
         varBox = create_varBox(x+40,y+10,7,minValue,minValue,maxValue),
 
         draw = function(self)
@@ -336,6 +367,7 @@ function checkMouseButtonClicks()
        if checkButtonClick(randomizeButton, randomize_all) then
             sfx(2)
             CHANGES = false
+            SCENE = "canvas"
         end
 
        local managers = {patternSizeManager, canvasSizeManager, palleteSizeManager}
@@ -343,6 +375,8 @@ function checkMouseButtonClicks()
             if checkButtonClick(manager.plusButton, 
                             function()
                                 manager.varBox:sumValue(1)
+                                manager.plusButton:on_click()
+
                                 sfx(0)
                             end) then
                 CHANGES = true
@@ -350,6 +384,7 @@ function checkMouseButtonClicks()
             if checkButtonClick(manager.minusButton, 
                 function()
                     manager.varBox:sumValue(-1)
+                    manager.minusButton:on_click()
                     sfx(1)
                 end) then
                 CHANGES = true
@@ -366,12 +401,13 @@ function checkMouseButtonClicks()
                                 for i=1,#ALL_CANVAS do
                                     ALL_CANVAS[i] = nil
                                 end
-                                ALL_CANVAS = nil
 
+                                ALL_CANVAS = nil
                                 ALL_CANVAS = create_all_canvas(CANVAS_SIZE)
                                 GENERATION = 0
                                 CHANGES = false
                                 Mouse.onCanvas = 1
+                                SCENE = "canvas"
                                 sfx(3)
                             end) then
                             for i=1,#ALL_CANVAS do
@@ -383,3 +419,26 @@ function checkMouseButtonClicks()
     end
 end
 --------------------------------------------------------
+function create_pop_up (x,y,text,conditionFunction)
+    p = {
+        x=x,
+        y=y,
+        color=7,
+        text=text,
+
+        draw = function(self)
+            if conditionFunction() then
+                local digits = #self.text
+                local adjustSize = (digits) * 4
+
+                rectfill(self.x,self.y-2,self.x+adjustSize+6,self.y+7,0)
+                rect(self.x,self.y-2,self.x+adjustSize+6,self.y+7,7)
+                print(self.text,self.x+2,self.y,self.color)
+            end
+        end,
+
+        update = function()
+        end
+    }
+    return p
+end

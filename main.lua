@@ -6,28 +6,36 @@ function _init()
     GENERATION = 0
     CHANGES = false
     SCENE = "pause"
+    TITLE_COLOR = 2
 
     ALL_CANVAS = create_all_canvas(CANVAS_SIZE)
     Mouse = returnMouseObj()
     genPopUp = create_generation_pop_up()
+    pausePopUp = create_pop_up(0,119,"press ❎ or 'x' to instructions",checkMouseBottonScreen)
+    canvasPopUp1 = create_pop_up(15,119,"press ❎ or 'x' to mutate",checkMouseBottonScreen)
+    canvasPopUp2 = create_pop_up(15,110,"press 🅾️ or 'z' to params",checkMouseBottonScreen)
 
-    applyButton = create_button(60,80,7,"apply changes")
-    randomizeButton = create_button(60,100,7,"randomize canvas")
-    patternSizeManager = create_manager(30,3,1,15,"program size")
+    applyButton = create_button(60,90,7,"apply changes")
+    randomizeButton = create_button(60,110,7,"randomize canvas")
+    patternSizeManager = create_manager(25,3,1,15,"program max size")
     patternSizeManager.varBox.value = PATTERN_SIZE
-    canvasSizeManager = create_manager(30,30,5,50,"canvas size")
+    canvasSizeManager = create_manager(25,30,5,50,"canvas size")
     canvasSizeManager.varBox.value = CANVAS_SIZE
-    palleteSizeManager = create_manager(30,57,1,15,"pallete max size")
+    palleteSizeManager = create_manager(25,57,1,15,"pallete max size")
     palleteSizeManager.varBox.value = PALLETE_MAX_SIZE 
+    BUTTONS = {applyButton, randomizeButton}
+    MANAGERS = {patternSizeManager, canvasSizeManager, palleteSizeManager}
 end
 
 function _update()
     Mouse:update()
-   if SCENE == "canvas" then
+    if SCENE == "canvas" then
         update_canvaScene()
     elseif SCENE == "pause" then
         update_pause()
-   end
+    elseif SCENE == "start" then
+        update_start()
+    end
 end
 
 function _draw()
@@ -36,6 +44,8 @@ function _draw()
         draw_canvaScene()
     elseif SCENE == "pause" then
         draw_pause()
+    elseif SCENE == "start" then
+        draw_start()
     end
     Mouse:draw()
 

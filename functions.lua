@@ -33,6 +33,9 @@ function alter_const(const,action,inputIndex)
             --const
             if mutation == 0 then
                 self.const += rnd(2) - 1
+                if rnd(100) < 2 then
+                    self.const += self.const*0.5
+                end
             --change action
             elseif mutation == 1 then
                 self.action = rnd(actions)
