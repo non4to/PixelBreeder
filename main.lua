@@ -5,7 +5,7 @@ function _init()
     PALLETE_MAX_SIZE = 2
     GENERATION = 0
     CHANGES = false
-    SCENE = "pause"
+    SCENE = "start"
     TITLE_COLOR = 2
 
     ALL_CANVAS = create_all_canvas(CANVAS_SIZE)
